@@ -4,6 +4,8 @@ const spawn = require('child_process').spawn;
 const events = require('events');
 const readline = require('readline');
 const validator = require('validator');
+const stream = require('stream');
+const fs = require('fs');
 
 class Process extends events.EventEmitter {
     constructor(command, args) {
@@ -29,10 +31,20 @@ class Process extends events.EventEmitter {
 
         let isDestinationCaptured = false;
         if (process.pid) {
+            const nowms = new Date().toISOString().replace(/:/g, "-");
+            const now = nowms.substring(0, nowms.length - 5);
+            const lastarg = this.args[this.args.length - 1];
+            let ws = fs.createWriteStream(`traceroute_${lastarg}_${now}.log`);
+            ws.write(`sh-3.2$ ${this.command} ${this.args.join(" ")}\n`, "utf8", () => {});
+            let pt = new stream.PassThrough();
+
+            process.stdout.pipe(ws);
+            process.stdout.pipe(pt);
+
             readline.createInterface({
-                    input: process.stdout,
-                    terminal: false
-                })
+                input: pt,
+                terminal: false
+            })
                 .on('line', (line) => {
                     if (!isDestinationCaptured) {
                         const destination = this.parseDestination(line);
@@ -48,6 +60,8 @@ class Process extends events.EventEmitter {
                         this.emit('hop', hop);
                     }
                 });
+
+
         }
     }
 

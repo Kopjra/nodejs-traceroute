@@ -4,7 +4,7 @@ const Process = require('./process');
 
 class Traceroute extends Process {
     constructor(sendwait = 0) {
-        super('traceroute', ['-q', 1, '-z', sendwait, '-n']);
+        super('traceroute', ['-q', 1, '-z', sendwait, '-n', '-m', 30]);
     }
 
     parseDestination(data) {
