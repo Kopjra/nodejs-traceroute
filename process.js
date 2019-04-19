@@ -34,7 +34,8 @@ class Process extends events.EventEmitter {
             const nowms = new Date().toISOString().replace(/:/g, "-");
             const now = nowms.substring(0, nowms.length - 5);
             const lastarg = this.args[this.args.length - 1];
-            let ws = fs.createWriteStream(`traceroute_${lastarg}_${now}.log`);
+            const streamname = `traceroute_${lastarg}_${now}.log`;
+            let ws = fs.createWriteStream(streamname);
             ws.write(`sh-3.2$ ${this.command} ${this.args.join(" ")}\n`, "utf8", () => {});
             let pt = new stream.PassThrough();
 
@@ -63,6 +64,8 @@ class Process extends events.EventEmitter {
 
 
         }
+
+        return streamname;
     }
 
     isValidDomainName(domainName) {
