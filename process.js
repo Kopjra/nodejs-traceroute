@@ -8,11 +8,12 @@ const stream = require('stream');
 const fs = require('fs');
 
 class Process extends events.EventEmitter {
-    constructor(command, args) {
+    constructor(command, args, logfilePostfix) {
         super();
 
         this.command = command;
         this.args = args;
+        this.logfilePostfix = logfilePostfix;
     }
 
     trace(domainName) {
@@ -29,12 +30,11 @@ class Process extends events.EventEmitter {
 
         this.emit('pid', process.pid);
 
+        const lastarg = this.args[this.args.length - 1];
+        const streamname = `traceroute_${lastarg}_${this.logfilePostfix}.log`;
+
         let isDestinationCaptured = false;
         if (process.pid) {
-            const nowms = new Date().toISOString().replace(/:/g, "-");
-            const now = nowms.substring(0, nowms.length - 5);
-            const lastarg = this.args[this.args.length - 1];
-            const streamname = `traceroute_${lastarg}_${now}.log`;
             let ws = fs.createWriteStream(streamname);
             ws.write(`sh-3.2$ ${this.command} ${this.args.join(" ")}\n`, "utf8", () => {});
             let pt = new stream.PassThrough();

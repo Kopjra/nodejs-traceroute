@@ -3,8 +3,9 @@
 const Process = require('./process');
 
 class Traceroute extends Process {
-    constructor(sendwait = 0) {
-        super('traceroute', ['-q', 1, '-z', sendwait, '-n', '-m', 30]);
+    // TODO mettere come opzioni una directory in cui scrivere i file di log e un postfix e/o prefix per il nome del file di log, o l'intero nome
+    constructor(logfilePostfix, sendwait = 0) {
+        super('traceroute', ['-q', 1, '-z', sendwait, '-n', '-m', 30], logfilePostfix);
     }
 
     parseDestination(data) {
